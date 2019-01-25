@@ -137,7 +137,11 @@ static int rtp_parse_mp4_au(PayloadContext *data, const uint8_t *buf, int len)
     /* XXX: Wrong if optional additional sections are present (cts, dts etc...) */
     au_header_size = data->sizelength + data->indexlength;
     if (au_header_size <= 0 || (au_headers_length % au_header_size != 0))
-        return -1;
+	{
+		printf ("Error in rtp_parse_mp4_au():\t au_header_size=%d (expected >0) =data->sizelength (=%d) + data->indexlength(=%d)\n", 
+		au_header_size,data->sizelength, data->indexlength);
+		return -1;
+}
 
     data->nb_au_headers = au_headers_length / au_header_size;
     if (!data->au_headers || data->au_headers_allocated < data->nb_au_headers) {
@@ -291,10 +295,14 @@ static int parse_fmtp(AVFormatContext *s,
                 if (attr_names[i].type == ATTR_NAME_TYPE_INT) {
                     int val = atoi(value);
                     if (val > 32) {
+                         if(strcmp(attr_names[i].str,"profile-level-id")==0){
+							 
+						 } 
+						 else {
                         av_log(s, AV_LOG_ERROR,
                                "The %s field size is invalid (%d)\n",
                                attr, val);
-                        return AVERROR_INVALIDDATA;
+							   return AVERROR_INVALIDDATA;}
                     }
                     *(int *)((char *)data+
                         attr_names[i].offset) = val;

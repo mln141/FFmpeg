@@ -33,6 +33,7 @@
 #include "network.h"
 #include "os_support.h"
 #include "url.h"
+#include <string.h>
 
 /* This is for MPEG-TS and it's a default SRTO_PAYLOADSIZE for SRTT_LIVE (8 TS packets) */
 #ifndef SRT_LIVE_DEFAULT_PAYLOAD_SIZE
@@ -212,13 +213,15 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
         return libsrt_neterrno(h);
 
     while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
-       /* switch (ret) {
+       switch (ret) {
         case AVERROR(ETIMEDOUT):
+            char message[1024];
+            snprintf(message, 1024, "libsrt_network_wait_fd_timeout TIMEOUTED, timeout=%d\n", timeout);
+            av_log(h, AV_LOG_DEBUG, message);
             continue;
         default:
             return ret;
-        }*/
-         return ret;
+        }
     }
 
     ret = srt_accept(fd, NULL, NULL);

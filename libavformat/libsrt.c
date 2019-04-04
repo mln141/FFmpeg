@@ -212,12 +212,13 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
         return libsrt_neterrno(h);
 
     while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
-        switch (ret) {
+       /* switch (ret) {
         case AVERROR(ETIMEDOUT):
             continue;
         default:
             return ret;
-        }
+        }*/
+         return ret;
     }
 
     ret = srt_accept(fd, NULL, NULL);
@@ -376,8 +377,14 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
         }
         if (av_find_info_tag(buf, sizeof(buf), "listen_timeout", p)) {
             s->listen_timeout = strtol(buf, NULL, 10);
+            av_log(h, AV_LOG_WARNING,
+                           "Setting listen_timeout to (%d)\n",
+                           s->listen_timeout);
         }
     }
+    av_log(h, AV_LOG_WARNING,
+                           "Value listen_timeout = (%d)\n",
+                           s->listen_timeout);
     if (s->rw_timeout >= 0) {
         open_timeout = h->rw_timeout = s->rw_timeout;
     }

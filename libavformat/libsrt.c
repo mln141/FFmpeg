@@ -381,12 +381,12 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
         if (av_find_info_tag(buf, sizeof(buf), "listen_timeout", p)) {
             s->listen_timeout = strtol(buf, NULL, 10);
             av_log(h, AV_LOG_WARNING,
-                           "Setting listen_timeout to (%d)\n",
+                           "Setting listen_timeout to (%lld)\n",
                            s->listen_timeout);
         }
     }
     av_log(h, AV_LOG_WARNING,
-                           "Value listen_timeout = (%d)\n",
+                           "Value listen_timeout = (%lld)\n",
                            s->listen_timeout);
     if (s->rw_timeout >= 0) {
         open_timeout = h->rw_timeout = s->rw_timeout;

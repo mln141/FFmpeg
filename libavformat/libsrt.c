@@ -211,8 +211,19 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     ret = srt_listen(fd, 1);
     if (ret)
         return libsrt_neterrno(h);
-
-    while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
+    
+    //while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
+    
+    int64_t wstart_time = av_gettime_relative();
+    while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, 1, &h->interrupt_callback))) {       
+        
+       if ((timeout > 0) &&
+           (av_gettime_relative() - wstart_time > timeout)) {
+           av_log(h, AV_LOG_DEBUG, "libsrt_listen, network wait TIMEDOUT, timeout=%lld\n", timeout);
+           return ret;
+       }
+        
+/*        
        switch (ret) {
         case AVERROR(ETIMEDOUT):
             av_log(h, AV_LOG_DEBUG, "libsrt_network_wait_fd_timeout TIMEOUTED, timeout=%lld\n", timeout);
@@ -220,6 +231,7 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
         default:
             return ret;
         }
+*/
     }
 
     ret = srt_accept(fd, NULL, NULL);

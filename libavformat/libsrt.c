@@ -214,6 +214,7 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     
     //while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
     
+    av_log(h, AV_LOG_DEBUG, "libsrt_listen, starting network wait\n");
     int64_t wstart_time = av_gettime_relative();
     while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, 1, &h->interrupt_callback))) {       
         

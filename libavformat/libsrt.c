@@ -197,7 +197,7 @@ static int libsrt_network_wait_fd_timeout(URLContext *h, int eid, int fd, int wr
     }
 }
 
-static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, URLContext *h, int timeout)
+static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, URLContext *h, int64_t timeout)
 {
     int ret;
     int reuse = 1;
@@ -215,8 +215,8 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
        switch (ret) {
         case AVERROR(ETIMEDOUT):
-            av_log(h, AV_LOG_DEBUG, "libsrt_network_wait_fd_timeout TIMEOUTED, timeout=%d\n", timeout);
-            continue;
+            av_log(h, AV_LOG_DEBUG, "libsrt_network_wait_fd_timeout TIMEOUTED, timeout=%lld\n", timeout);
+            return ret;
         default:
             return ret;
         }
@@ -231,7 +231,7 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     return ret;
 }
 
-static int libsrt_listen_connect(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, int timeout, URLContext *h, int will_try_next)
+static int libsrt_listen_connect(int eid, int fd, const struct sockaddr *addr, socklen_t addrlen, int64_t timeout, URLContext *h, int will_try_next)
 {
     int ret;
 
@@ -314,7 +314,7 @@ static int libsrt_set_options_pre(URLContext *h, int fd)
     int latency = s->latency / 1000;
     int rcvlatency = s->rcvlatency / 1000;
     int peerlatency = s->peerlatency / 1000;
-    int connect_timeout = s->connect_timeout;
+    int64_t connect_timeout = s->connect_timeout;
 
     if ((s->mode == SRT_MODE_RENDEZVOUS && libsrt_setsockopt(h, fd, SRTO_RENDEZVOUS, "SRTO_RENDEZVOUS", &yes, sizeof(yes)) < 0) ||
         (s->transtype != SRTT_INVALID && libsrt_setsockopt(h, fd, SRTO_TRANSTYPE, "SRTO_TRANSTYPE", &s->transtype, sizeof(s->transtype)) < 0) ||
@@ -355,7 +355,7 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
     int ret;
     char hostname[1024],proto[1024],path[1024];
     char portstr[10];
-    int open_timeout = 5000000;
+    int64_t open_timeout = 5000000;
     int eid;
 
     eid = srt_epoll_create();

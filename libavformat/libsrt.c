@@ -217,10 +217,11 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     av_log(h, AV_LOG_DEBUG, "libsrt_listen, starting network wait\n");
     int64_t wstart_time = av_gettime_relative();
     while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, 1, &h->interrupt_callback))) {       
-        
-       if ((timeout > 0) &&
-           (av_gettime_relative() - wstart_time > timeout)) {
-           av_log(h, AV_LOG_DEBUG, "libsrt_listen, network wait TIMEDOUT, timeout=%lld\n", timeout);
+        int64_t tdiff = av_gettime_relative() - wstart_time;
+        av_log(h, AV_LOG_DEBUG, "av_gettime_relative=%lld, wstart_time=%lld, tdiff: %lld\n", av_gettime_relative(), wstart_time, tdiff);
+       if (timeout > 0 &&
+           tdiff > timeout) {           
+           av_log(h, AV_LOG_DEBUG, "libsrt_listen, network wait TIMEDOUT, tdiff=%lld\n", timeout);
            return ret;
        }
         
@@ -368,7 +369,8 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
     int ret;
     char hostname[1024],proto[1024],path[1024];
     char portstr[10];
-    int64_t open_timeout = 5000000;
+    //int64_t open_timeout = 5000000;
+    int64_t open_timeout = 5000;
     int eid;
 
     eid = srt_epoll_create();
@@ -439,7 +441,8 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
     }
     if (s->mode == SRT_MODE_LISTENER) {
         // multi-client
-        if ((ret = libsrt_listen(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen, h, open_timeout / 1000)) < 0)
+        //if ((ret = libsrt_listen(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen, h, open_timeout / 1000)) < 0)
+        if ((ret = libsrt_listen(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen, h, open_timeout)) < 0)
             goto fail1;
         fd = ret;
     } else {
@@ -448,9 +451,12 @@ static int libsrt_setup(URLContext *h, const char *uri, int flags)
             if (ret)
                 goto fail1;
         }
-
+/*
         if ((ret = libsrt_listen_connect(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen,
                                           open_timeout / 1000, h, !!cur_ai->ai_next)) < 0) {
+*/                                          
+        if ((ret = libsrt_listen_connect(s->eid, fd, cur_ai->ai_addr, cur_ai->ai_addrlen,
+                                          open_timeout, h, !!cur_ai->ai_next)) < 0) {        
             if (ret == AVERROR_EXIT)
                 goto fail1;
             else

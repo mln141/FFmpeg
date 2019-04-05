@@ -215,9 +215,7 @@ static int libsrt_listen(int eid, int fd, const struct sockaddr *addr, socklen_t
     while ((ret = libsrt_network_wait_fd_timeout(h, eid, fd, 1, timeout, &h->interrupt_callback))) {
        switch (ret) {
         case AVERROR(ETIMEDOUT):
-            char message[1024];
-            snprintf(message, 1024, "libsrt_network_wait_fd_timeout TIMEOUTED, timeout=%d\n", timeout);
-            av_log(h, AV_LOG_DEBUG, message);
+            av_log(h, AV_LOG_DEBUG, "libsrt_network_wait_fd_timeout TIMEOUTED, timeout=%d\n", timeout);
             continue;
         default:
             return ret;

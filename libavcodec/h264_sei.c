@@ -263,6 +263,23 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
         h->x264_build = build;
     if (e == 1 && build == 1 && !strncmp(user_data+16, "x264 - core 0000", 16))
         h->x264_build = 67;
+    
+    // pozreme sa, ci to je to co hladame...
+    if (size < 20)
+    {
+        av_log(h, AV_LOG_DEBUG, "SEI extension - invalid length of SEI\n");
+    }
+    else
+    {
+        av_log(h, AV_LOG_DEBUG, "SEI data, first 20 bytes:");
+        int i = 0;
+        for(i=0; i<20; ++i)
+        {
+            av_log(h, AV_LOG_DEBUG, "%02X ", user_data[i]);
+        }
+        av_log(h, AV_LOG_DEBUG, "\n");
+    }
+    
 
     av_free(user_data);
     return 0;

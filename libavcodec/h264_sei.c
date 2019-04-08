@@ -267,17 +267,17 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
     // pozreme sa, ci to je to co hladame...
     if (size < 20)
     {
-        av_log(h, AV_LOG_DEBUG, "SEI extension - invalid length of SEI\n");
+        av_log(NULL, AV_LOG_DEBUG, "SEI extension - invalid length of SEI\n");
     }
     else
     {
-        av_log(h, AV_LOG_DEBUG, "SEI data, first 20 bytes:");
+        av_log(NULL, AV_LOG_DEBUG, "SEI data, first 20 bytes:\n");
         int i = 0;
         for(i=0; i<20; ++i)
         {
-            av_log(h, AV_LOG_DEBUG, "%02X ", user_data[i]);
+            av_log(NULL, AV_LOG_DEBUG, "%02X ", user_data[i]);
         }
-        av_log(h, AV_LOG_DEBUG, "\n");
+        av_log(NULL, AV_LOG_DEBUG, "\n");
     }
     
 

@@ -292,8 +292,8 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
         memcpy((void*)h->raw_data, user_data, 255);
         h->raw_data_real_size_bytes = size;
     }
-*/
     h->raw_data_real_size_bytes = size;
+*/    
     av_free(user_data);
     return 0;
 }

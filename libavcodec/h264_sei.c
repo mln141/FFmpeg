@@ -265,7 +265,7 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
         h->x264_build = 67;
     
     // let's see whether it is something we are looking floor
-    
+/*    
     if (size < 20)
     {
         av_log(NULL, AV_LOG_DEBUG, "SEI extension - invalid length of SEI\n");
@@ -280,15 +280,17 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
         }
         av_log(NULL, AV_LOG_DEBUG, "\n");
     }
-    
+*/    
     // what we need should be upmost 255 bytes length
     if (size < 255)
     {
         memcpy(h->raw_data, user_data, size);
+        h->raw_data_size_bytes = size;
     }
     else
     {
         memcpy(h->raw_data, user_data, 255);
+        h->raw_data_size_bytes = size;
     }
 
     av_free(user_data);

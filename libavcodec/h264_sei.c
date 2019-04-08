@@ -447,6 +447,8 @@ int ff_h264_sei_decode(H264SEIContext *h, GetBitContext *gb,
             return AVERROR_INVALIDDATA;
         }
         next = get_bits_count(gb) + 8 * size;
+        
+        av_log(h, AV_DEBUG, "hh_h264_sei_decode: sei_type=%i\n", type);
 
         switch (type) {
         case H264_SEI_TYPE_PIC_TIMING: // Picture timing SEI

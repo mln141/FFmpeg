@@ -284,13 +284,13 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
     // what we need should be upmost 255 bytes length
     if (size < 255)
     {
-        memcpy(h->raw_data, user_data, size);
-        h->raw_data_size_bytes = size;
+        memcpy((void*)h->raw_data, user_data, size);
+        h->raw_data_real_size_bytes = size;
     }
     else
     {
-        memcpy(h->raw_data, user_data, 255);
-        h->raw_data_size_bytes = size;
+        memcpy((void*)h->raw_data, user_data, 255);
+        h->raw_data_real_size_bytes = size;
     }
 
     av_free(user_data);

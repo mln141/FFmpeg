@@ -265,7 +265,7 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
         h->x264_build = 67;
     
     // let's see whether it is something we are looking floor
-/*    
+    
     if (size < 20)
     {
         av_log(NULL, AV_LOG_DEBUG, "SEI extension - invalid length of SEI\n");
@@ -282,18 +282,15 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
     }
     
     // what we need should be upmost 255 bytes length
-    if (size < 255)
+    int size_to_copy = size;
+    if (size > 255)
     {
-        memcpy((void*)h->raw_data, user_data, size);
-        h->raw_data_real_size_bytes = size;
+	size_to_copy = 255;
+
     }
-    else
-    {
-        memcpy((void*)h->raw_data, user_data, 255);
-        h->raw_data_real_size_bytes = size;
-    }
-    h->raw_data_real_size_bytes = size;
-*/    
+    memcpy((void*)h->raw_data, user_data, size_to_copy);
+    h->raw_data_size_bytes = size;
+    
     av_free(user_data);
     return 0;
 }
@@ -461,7 +458,7 @@ int ff_h264_sei_decode(H264SEIContext *h, GetBitContext *gb,
         }
         next = get_bits_count(gb) + 8 * size;
         
-        av_log(h, AV_LOG_DEBUG, "hh_h264_sei_decode: sei_type=%i\n", type);
+//        av_log(h, AV_LOG_DEBUG, "hh_h264_sei_decode: sei_type=%i\n", type);
 
         switch (type) {
         case H264_SEI_TYPE_PIC_TIMING: // Picture timing SEI
